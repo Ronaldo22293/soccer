@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ultimate Soccer Players</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#07111f;color:#fff}
+header{padding:42px 20px;text-align:center;background:linear-gradient(135deg,#0b3d91,#07111f)}
+header h1{margin:0;font-size:42px}
+header p{color:#cbd8ed;font-size:18px}
+.container{max-width:1150px;margin:auto;padding:28px 18px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:18px}
+.card{background:#101e31;border:1px solid #263a55;border-radius:16px;padding:18px;text-align:center;cursor:pointer;transition:.2s}
+.card:hover{transform:translateY(-5px);border-color:#4aa3ff;box-shadow:0 8px 25px #0008}
+.avatar{height:150px;border-radius:12px;background:linear-gradient(145deg,#17365d,#0a1524);display:flex;align-items:center;justify-content:center;font-size:58px;margin-bottom:14px}
+.card h2{font-size:21px;margin:8px 0}
+.card p{margin:5px;color:#aebed4}
+button{border:0;border-radius:9px;padding:10px 15px;background:#1683ff;color:white;font-weight:bold;cursor:pointer}
+.modal{display:none;position:fixed;inset:0;background:#000b;z-index:10;padding:25px;overflow:auto}
+.profile{max-width:800px;margin:30px auto;background:#102034;border-radius:20px;padding:28px;position:relative;border:1px solid #355171}
+.close{position:absolute;right:18px;top:15px;background:#263c58;font-size:18px}
+.profile-top{display:flex;gap:25px;align-items:center;flex-wrap:wrap}
+.big-avatar{width:180px;height:180px;border-radius:18px;background:linear-gradient(145deg,#174b87,#0b1728);display:flex;align-items:center;justify-content:center;font-size:75px}
+.profile h1{font-size:36px;margin:0 0 8px}
+.badge{display:inline-block;background:#1683ff;padding:6px 10px;border-radius:20px;margin:4px}
+.info{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-top:24px}
+.info div{background:#172a42;padding:15px;border-radius:12px}
+.info b{display:block;color:#8db6e5;margin-bottom:5px}
+.section{margin-top:25px}
+.section h2{border-bottom:1px solid #304963;padding-bottom:8px}
+footer{text-align:center;padding:35px;color:#8fa2bb}
+</style>
+</head>
+<body>
+<header>
+<h1>⚽ Ultimate Soccer Players</h1>
+<p>13 legendary players • Click any player to see their full profile</p>
+</header>
+
+<div class="container">
+<div class="grid" id="players"></div>
+</div>
+
+<div class="modal" id="modal">
+<div class="profile">
+<button class="close" onclick="closeProfile()">✕</button>
+<div class="profile-top">
+<div class="big-avatar" id="pAvatar"></div>
+<div><h1 id="pName"></h1><span class="badge" id="pPosition"></span><span class="badge" id="pTeam"></span><p id="pCountry"></p></div>
+</div>
+<div class="info">
+<div><b>Position</b><span id="iPosition"></span></div>
+<div><b>Club</b><span id="iClub"></span></div>
+<div><b>Country</b><span id="iCountry"></span></div>
+<div><b>Number</b><span id="iNumber"></span></div>
+<div><b>Birth Year</b><span id="iBirth"></span></div>
+<div><b>Height</b><span id="iHeight"></span></div>
+</div>
+<div class="section"><h2>About</h2><p id="pAbout"></p></div>
+<div class="section"><h2>Career Highlights</h2><p id="pHighlights"></p></div>
+</div>
+</div>
+
+<footer>Made for soccer fans ⚽</footer>
+
+<script>
+const players = [
+{name:"Lionel Messi",pos:"Forward",team:"Inter Miami",country:"Argentina 🇦🇷",num:"10",birth:"1987",height:"1.70 m",emoji:"🐐",about:"One of football's greatest players, famous for his close control, passing, dribbling and finishing.",high:"World Cup winner, multiple Ballon d'Or awards, Champions League titles and major league championships."},
+{name:"Cristiano Ronaldo",pos:"Forward",team:"Al-Nassr",country:"Portugal 🇵🇹",num:"7",birth:"1985",height:"1.87 m",emoji:"⭐",about:"A prolific goal scorer known for athleticism, powerful shooting, heading and elite movement.",high:"European champion with Portugal, multiple Champions League titles and multiple Ballon d'Or awards."},
+{name:"Neymar Jr.",pos:"Forward",team:"Santos",country:"Brazil 🇧🇷",num:"10",birth:"1992",height:"1.75 m",emoji:"🔥",about:"A creative attacker known for flair, dribbling, skill moves and chance creation.",high:"Champions League winner, major domestic titles and Copa Libertadores winner."},
+{name:"Kylian Mbappé",pos:"Forward",team:"Real Madrid",country:"France 🇫🇷",num:"9",birth:"1998",height:"1.78 m",emoji:"⚡",about:"A lightning-fast forward known for explosive runs, finishing and one-on-one ability.",high:"World Cup winner with France and multiple French league titles."},
+{name:"Erling Haaland",pos:"Forward",team:"Manchester City",country:"Norway 🇳🇴",num:"9",birth:"2000",height:"1.95 m",emoji:"💥",about:"A powerful striker with exceptional positioning, speed for his size and goal-scoring instincts.",high:"Premier League, Champions League and domestic treble winner with Manchester City."},
+{name:"Vinícius Júnior",pos:"Forward",team:"Real Madrid",country:"Brazil 🇧🇷",num:"7",birth:"2000",height:"1.76 m",emoji:"⚡",about:"A dynamic winger known for pace, dribbling and creating danger from the left side.",high:"Champions League winner and multiple Spanish league titles with Real Madrid."},
+{name:"Mohamed Salah",pos:"Forward",team:"Liverpool",country:"Egypt 🇪🇬",num:"11",birth:"1992",height:"1.75 m",emoji:"👑",about:"A left-footed attacker famous for pace, cutting inside and consistent scoring.",high:"Premier League and Champions League winner with Liverpool."},
+{name:"Kevin De Bruyne",pos:"Midfielder",team:"Manchester City",country:"Belgium 🇧🇪",num:"17",birth:"1991",height:"1.81 m",emoji:"🎯",about:"An elite playmaker known for vision, passing range, crossing and powerful long shots.",high:"Multiple Premier League titles and Champions League winner with Manchester City."},
+{name:"Luka Modrić",pos:"Midfielder",team:"Real Madrid",country:"Croatia 🇭🇷",num:"10",birth:"1985",height:"1.72 m",emoji:"🧠",about:"A technical midfielder known for control, passing, vision and composure.",high:"Ballon d'Or winner, multiple Champions League titles and World Cup finalist."},
+{name:"Robert Lewandowski",pos:"Forward",team:"Barcelona",country:"Poland 🇵🇱",num:"9",birth:"1988",height:"1.85 m",emoji:"🎯",about:"A world-class striker known for finishing, positioning and scoring from many areas.",high:"Champions League winner and multiple Bundesliga and Spanish league titles."},
+{name:"Jude Bellingham",pos:"Midfielder",team:"Real Madrid",country:"England 🏴",num:"5",birth:"2003",height:"1.86 m",emoji:"⭐",about:"A versatile midfielder combining athleticism, ball carrying, passing and late runs into the box.",high:"Spanish league and Champions League winner with Real Madrid."},
+{name:"Harry Kane",pos:"Forward",team:"Bayern Munich",country:"England 🏴",num:"9",birth:"1993",height:"1.88 m",emoji:"⚽",about:"A complete striker known for finishing, passing, hold-up play and long-range shooting.",high:"Multiple Premier League Golden Boots and major individual scoring records."},
+{name:"Rodri",pos:"Midfielder",team:"Manchester City",country:"Spain 🇪🇸",num:"16",birth:"1996",height:"1.91 m",emoji:"🛡️",about:"A dominant defensive midfielder known for positioning, passing, ball recovery and control.",high:"Champions League winner, Premier League titles and European Championship winner."}
+];
+
+const grid=document.getElementById("players");
+players.forEach((p,i)=>{
+ const c=document.createElement("div"); c.className="card";
+ c.innerHTML=`<div class="avatar">${p.emoji}</div><h2>${p.name}</h2><p>${p.pos}</p><p>${p.team}</p><button>View Profile</button>`;
+ c.onclick=()=>openProfile(i); grid.appendChild(c);
+});
+function openProfile(i){
+ const p=players[i];
+ document.getElementById("pAvatar").textContent=p.emoji;
+ document.getElementById("pName").textContent=p.name;
+ document.getElementById("pPosition").textContent=p.pos;
+ document.getElementById("pTeam").textContent=p.team;
+ document.getElementById("pCountry").textContent=p.country;
+ document.getElementById("iPosition").textContent=p.pos;
+ document.getElementById("iClub").textContent=p.team;
+ document.getElementById("iCountry").textContent=p.country;
+ document.getElementById("iNumber").textContent=p.num;
+ document.getElementById("iBirth").textContent=p.birth;
+ document.getElementById("iHeight").textContent=p.height;
+ document.getElementById("pAbout").textContent=p.about;
+ document.getElementById("pHighlights").textContent=p.high;
+ document.getElementById("modal").style.display="block";
+}
+function closeProfile(){document.getElementById("modal").style.display="none"}
+window.onclick=e=>{if(e.target===document.getElementById("modal"))closeProfile()}
+</script>
+</body>
+</html>
